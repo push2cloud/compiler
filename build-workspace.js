@@ -2,6 +2,7 @@ const debug = require('debug')('push2cloud-compiler:build-workspace');
 const async = require('async');
 const _ = require('lodash');
 const mkdirp = _.curry(require('mkdirp'), 2);
+const rimraf = require('rimraf');
 const join = require('path').join;
 
 const debugCb = require('./lib/debugCb');
@@ -15,11 +16,20 @@ const tools = {
 };
 
 const buildWorkspace = (
-  plugins
+  options
+, plugins
 , deploymentConfigPath
 , workspacePath
 , done
 ) => {
+  if (!done) {
+    done = workspacePath;
+    workspacePath = deploymentConfigPath;
+    deploymentConfigPath = plugins;
+    plugins = options;
+    options = {};
+  }
+  options = options || {};
   debug('Creating the workspace...');
   deploymentConfigPath = deploymentConfigPath || join(process.cwd(), 'deploymentConfig.json');
   workspacePath = workspacePath || join(process.cwd(), '__workspace');
@@ -32,8 +42,15 @@ const buildWorkspace = (
   const postActionPlugins = _.filter(plugins, (p) => p.postAction);
   debug('building workspace');
 
+  var clear = (cb) => cb();
+
+  if (options.clearWorkspace) {
+    clear = (cb) => rimraf(workspacePath, cb);
+  }
+
   async.series(
-    [ mkdirp(workspacePath)
+    [ clear
+    , mkdirp(workspacePath)
     , (cb) => async.each(
         config.apps
       , (app, next) => {
