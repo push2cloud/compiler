@@ -2,6 +2,7 @@ const _ = require('lodash');
 const async = require('async');
 const copy = require('cp-file');
 const join = require('path').join;
+const rimraf = require('rimraf');
 
 const createTmpDir = require('./lib/createTmpDir');
 
@@ -21,11 +22,15 @@ const TMP_DIR = '__manifests';
 const DEPLOYMENT_MANIFEST = 'deploymentManifest.json';
 
 const prepare = (
-  plugins
+  options
+, plugins
 , deploymentManifestPath
 , tmpDir
 , done
 ) => {
+
+  options = options || {};
+
   const getFile = _.find(plugins, (p) => p.getFile).getFile;
   const getFileAs = _.find(plugins, (p) => p.getFileAs).getFileAs;
 
@@ -35,6 +40,13 @@ const prepare = (
 
   tmpDir = tmpDir || join(process.cwd(), TMP_DIR);
   const tmpDeploymentManifest = join(tmpDir, DEPLOYMENT_MANIFEST);
+
+  var clear = (cb) => cb();
+
+  if (options.clearWorkspace) {
+    clear = (cb) => rimraf(tmpDir, cb);
+  }
+
 
   const afterPlugins = _.map(_.filter(plugins, (p) => p.afterPrepare),
     (p) => p.afterPrepare.bind(p, tmpDir));
@@ -48,7 +60,8 @@ const prepare = (
     .concat(afterPlugins);
 
   async.waterfall([
-    createTmpDir(tmpDir)
+      clear
+    , createTmpDir(tmpDir)
     , (next) => {
       cp(deploymentManifestPath, tmpDeploymentManifest)((err) => {
         if (err) return next(err);
