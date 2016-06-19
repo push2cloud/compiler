@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "async": "2.0.0-rc.3",
-    "copy": "0.2.0",
+    "copy": "0.2.2",
     "cp-file": "3.1.0",
     "debug": "2.2.0",
     "fs-symlink": "1.2.1",
