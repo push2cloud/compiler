@@ -24,7 +24,7 @@
   "dependencies": {
     "async": "2.0.0-rc.3",
     "copy": "0.2.3",
-    "cp-file": "3.1.0",
+    "cp-file": "3.2.0",
     "debug": "2.2.0",
     "fs-symlink": "1.2.1",
     "git-archive": "0.1.4",
