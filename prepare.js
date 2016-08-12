@@ -60,15 +60,14 @@ const prepare = (
     .concat(afterPlugins);
 
   async.waterfall([
-      clear
-    , createTmpDir(tmpDir)
-    , (next) => {
-      cp(deploymentManifestPath, tmpDeploymentManifest)((err) => {
-        if (err) return next(err);
-        next(null, require(tmpDeploymentManifest));
-      });
-    }
-  ].concat(afterDeploymentPlugins)
+    clear
+  , createTmpDir(tmpDir)
+  , (next) => {
+    cp(deploymentManifestPath, tmpDeploymentManifest)((err) => {
+      if (err) return next(err);
+      next(null, require(tmpDeploymentManifest));
+    });
+  }].concat(afterDeploymentPlugins)
   .concat([
     getReleaseManifest(tmpDir)
   ])

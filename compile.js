@@ -76,7 +76,7 @@ const compile = (
     a.disk = convertSize(a.disk);
     a.instances = convertSize(a.instances);
     if (appManifest.deployment.path || appManifest.deployment.appBits) {
-      a.appBits = appManifest.deployment.path || appManifest.deployment.appBits
+      a.appBits = appManifest.deployment.path || appManifest.deployment.appBits;
     }
 
     return a;
