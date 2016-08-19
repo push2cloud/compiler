@@ -13,6 +13,7 @@ const mapServices = require('./lib/mapServices');
 const omitApps = require('./lib/omitApps');
 const requireJSONIn = require('./lib/requireJSON');
 const convertSize = require('./lib/convertSize');
+const repoHash = require('./lib/repoHash');
 
 
 const initialState =
@@ -38,8 +39,7 @@ const compile = (
   deploymentManifestPath = deploymentManifestPath || 'deploymentManifest.json';
 
   const requireJSON = requireJSONIn(manifestDir);
-  const requireAppManifests = (apps) => _.map(apps, (app, appName) =>
-    requireJSON(join(app.path, app.manifest || 'package.json')));
+  const requireAppManifests = (apps) => _.map(apps, (app, appName) => requireJSON(join(repoHash(app.source), app.path || '', app.manifest || 'package.json')));
 
   // require all the manifests
   const deploymentManifest = requireJSON(deploymentManifestPath);
@@ -63,7 +63,10 @@ const compile = (
 
   config.apps = _.map(config.apps, (app) => {
     const appManifest = _.find(appManifests, (tf) => tf.name === app.name);
-    if (!appManifest.deployment) throw new Error(`App ${appManifest.name} has no deployment settings`);
+    if (!appManifest.deployment) {
+      debug(`App ${appManifest.name} has no deployment settings!`);
+      appManifest.deployment = {};
+    }
 
     var a = _.assign({},
       app,
