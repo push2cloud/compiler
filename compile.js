@@ -39,11 +39,12 @@ const compile = (
   deploymentManifestPath = deploymentManifestPath || 'deploymentManifest.json';
 
   const requireJSON = requireJSONIn(manifestDir);
-  const requireAppManifests = (apps) => _.map(apps, (app, appName) => requireJSON(join(repoHash(app.source), app.path || '', app.manifest || 'package.json')));
 
   // require all the manifests
   const deploymentManifest = requireJSON(deploymentManifestPath);
   const releaseManifest = requireJSON('releaseManifest.json');
+
+  const requireAppManifests = (apps) => _.map(apps, (app, appName) => requireJSON(join(repoHash(app.source || releaseManifest.source), app.path || '', app.manifest || 'package.json')));
 
   const config = _.assign({}, initialState,
     { version: releaseManifest.version
