@@ -1,6 +1,6 @@
 {
   "name": "push2cloud-compiler",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "compiler for push2cloud manifests",
   "scripts": {
     "lint": "eslint .",
