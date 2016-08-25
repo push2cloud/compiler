@@ -70,7 +70,7 @@ const buildWorkspace = (
         debug('starting postActions');
         const source = hashes[hash];
         const rootDir = join(workspacePath, 'by-id', hash);
-        const postActionPlugins = _.filter(plugins, (p) => p.postAction && p.type === source.type);
+        const postActionPlugins = _.filter(plugins, (p) => p.postAction);
 
         async.series(
           _.map(postActionPlugins, (p) =>

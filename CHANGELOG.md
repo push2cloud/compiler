@@ -1,3 +1,6 @@
+## [v2.0.1](https://github.com/push2cloud/compiler/compare/v2.0.0...v2.0.1)
+- regression fix for postAction plugins
+
 ## [v2.0.0](https://github.com/push2cloud/compiler/compare/v1.1.1...v2.0.0)
 - breaking change in interface to some plugins
 
