@@ -38,8 +38,6 @@ const buildWorkspace = (
   debug('loading deploymentConfig');
   const config = requireJSON(deploymentConfigPath);
   const hashes = {};
-  const getSourcePlugins = _.filter(plugins, (p) => p.getSource);
-  const postActionPlugins = _.filter(plugins, (p) => p.postAction);
   debug('building workspace');
 
   var clear = (cb) => cb();
@@ -60,7 +58,7 @@ const buildWorkspace = (
 
         if (hashes[hash]) return next();
         hashes[hash] = app.source;
-        debug(plugins, getSourcePlugins);
+        const getSourcePlugins = _.filter(plugins, (p) => p.getSource && p.type === app.source.type);
 
         async.series(
           _.map(getSourcePlugins, (p) => p.getSource(app, target))
@@ -72,6 +70,7 @@ const buildWorkspace = (
         debug('starting postActions');
         const source = hashes[hash];
         const rootDir = join(workspacePath, 'by-id', hash);
+        const postActionPlugins = _.filter(plugins, (p) => p.postAction && p.type === source.type);
 
         async.series(
           _.map(postActionPlugins, (p) =>

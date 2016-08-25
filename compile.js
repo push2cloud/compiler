@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const async = require('async');
 const join = require('path').join;
+const debug = require('debug')('push2cloud-compiler:compile');
 
 const mapAppDefaults = require('./lib/mapAppDefaults');
 const mapEnvVars = require('./lib/mapEnvVars');

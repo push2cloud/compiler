@@ -2,10 +2,12 @@ const _ = require('lodash');
 const async = require('async');
 const copy = require('cp-file');
 const join = require('path').join;
+const dirname = require('path').dirname;
 const rimraf = require('rimraf');
 
 const createTmpDir = require('./lib/createTmpDir');
-
+const getReleaseManifest = require('./lib/getReleaseManifest');
+const getAppManifests = require('./lib/getAppManifests');
 
 const cp = _.curry((
   from
@@ -17,7 +19,6 @@ const cp = _.curry((
   .catch(cb)
 ), 3);
 
-
 const TMP_DIR = '__manifests';
 const DEPLOYMENT_MANIFEST = 'deploymentManifest.json';
 
@@ -28,15 +29,7 @@ const prepare = (
 , tmpDir
 , done
 ) => {
-
   options = options || {};
-
-  const getFile = _.find(plugins, (p) => p.getFile).getFile;
-  const getFileAs = _.find(plugins, (p) => p.getFileAs).getFileAs;
-
-  const getReleaseManifest = require('./lib/getReleaseManifest')(getFileAs);
-  const getAppManifests = require('./lib/getAppManifests')(getFile);
-
 
   tmpDir = tmpDir || join(process.cwd(), TMP_DIR);
   const tmpDeploymentManifest = join(tmpDir, DEPLOYMENT_MANIFEST);
@@ -47,7 +40,6 @@ const prepare = (
     clear = (cb) => rimraf(tmpDir, cb);
   }
 
-
   const afterPlugins = _.map(_.filter(plugins, (p) => p.afterPrepare),
     (p) => p.afterPrepare.bind(p, tmpDir));
   const afterReleasePlugins = _.map(_.filter(plugins, (p) => p.afterGetReleaseManifest),
@@ -56,7 +48,7 @@ const prepare = (
     (p) => p.afterGetDeploymentManifest.bind(p, tmpDir));
 
   const afterRelease = afterReleasePlugins
-    .concat([getAppManifests(tmpDir)])
+    .concat([getAppManifests(plugins, tmpDir)])
     .concat(afterPlugins);
 
   async.waterfall([
@@ -68,9 +60,7 @@ const prepare = (
       next(null, require(tmpDeploymentManifest));
     });
   }].concat(afterDeploymentPlugins)
-  .concat([
-    getReleaseManifest(tmpDir)
-  ])
+  .concat([getReleaseManifest(plugins, tmpDir, dirname(deploymentManifestPath))])
   .concat(afterRelease)
   , done);
 };
