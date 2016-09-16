@@ -1,3 +1,6 @@
+## [v2.0.2](https://github.com/push2cloud/compiler/compare/v2.0.1...v2.0.2)
+- fix replaceEnvVar when not a string
+
 ## [v2.0.1](https://github.com/push2cloud/compiler/compare/v2.0.0...v2.0.1)
 - regression fix for postAction plugins
 
