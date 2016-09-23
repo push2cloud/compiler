@@ -19,7 +19,7 @@
   "repository": "push2cloud/compiler",
   "homepage": "http://push2.cloud/",
   "devDependencies": {
-    "eslint": "3.5.0"
+    "eslint": "3.6.0"
   },
   "dependencies": {
     "async": "2.0.1",
