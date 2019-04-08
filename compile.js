@@ -17,24 +17,24 @@ const convertSize = require('./lib/convertSize');
 const repoHash = require('./lib/repoHash');
 
 
-const initialState =
-  { version: null
-  , target: null
-  , services: []
-  , apps: []
-  , utilityApps: []
-  , envVars: []
-  , serviceBindings: []
-  , routes: []
-  , scripts: {}
-  };
+const initialState = {
+  version: null,
+  target: null,
+  services: [],
+  apps: [],
+  utilityApps: [],
+  envVars: [],
+  serviceBindings: [],
+  routes: [],
+  scripts: {}
+};
 
 
 const compile = (
   plugins
-, manifestDir
-, deploymentManifestPath
-, done
+  , manifestDir
+  , deploymentManifestPath
+  , done
 ) => {
   manifestDir = manifestDir || join(process.cwd(), '__manifests');
   deploymentManifestPath = deploymentManifestPath || 'deploymentManifest.json';
@@ -48,8 +48,9 @@ const compile = (
   const requireAppManifests = (apps) => _.map(apps, (app, appName) => requireJSON(join(repoHash(app.source || releaseManifest.source), app.path || '', app.manifest || 'package.json')));
 
   const config = _.assign({}, initialState,
-    { version: releaseManifest.version
-    , target: deploymentManifest.target
+    {
+      version: releaseManifest.version,
+      target: deploymentManifest.target
     });
 
 
@@ -72,8 +73,9 @@ const compile = (
 
     var a = _.assign({},
       app,
-      { scripts: mapAppScripts(deploymentManifest, appManifest)
-      , source: mapAppSource(releaseManifest, app.name)
+      {
+        scripts: mapAppScripts(deploymentManifest, appManifest),
+        source: mapAppSource(releaseManifest, app.name)
       }
     );
 
@@ -92,8 +94,9 @@ const compile = (
 
     return _.assign({},
       utilityApp,
-      { scripts: mapAppScripts(deploymentManifest, utilityAppManifest)
-      , source: mapAppSource(releaseManifest, utilityApp.name)
+      {
+        scripts: mapAppScripts(deploymentManifest, utilityAppManifest),
+        source: mapAppSource(releaseManifest, utilityApp.name)
       }
     );
   });
@@ -127,7 +130,7 @@ const compile = (
   const manis = { deployment: deploymentManifest, release: releaseManifest, apps: appManifests };
   const cleanPlugins = _.compact(plugins);
   _.isEmpty(cleanPlugins) ? done(null, config) :
-  async.waterfall([(cb) => cb(null, config, manis, tools)].concat(plugins), done);
+    async.waterfall([(cb) => cb(null, config, manis, tools)].concat(plugins), done);
 };
 
 module.exports = compile;

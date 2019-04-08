@@ -10,24 +10,24 @@ const getReleaseManifest = require('./lib/getReleaseManifest');
 const getAppManifests = require('./lib/getAppManifests');
 
 const cp = _.curry((
-  from
-, to
-, cb
+  from,
+  to,
+  cb
 ) => (
   copy(from, to)
-  .then(() => cb(null))
-  .catch(cb)
+    .then(() => cb(null))
+    .catch(cb)
 ), 3);
 
 const TMP_DIR = '__manifests';
 const DEPLOYMENT_MANIFEST = 'deploymentManifest.json';
 
 const prepare = (
-  options
-, plugins
-, deploymentManifestPath
-, tmpDir
-, done
+  options,
+  plugins,
+  deploymentManifestPath,
+  tmpDir,
+  done
 ) => {
   options = options || {};
 
@@ -52,16 +52,16 @@ const prepare = (
     .concat(afterPlugins);
 
   async.waterfall([
-    clear
-  , createTmpDir(tmpDir)
-  , (next) => {
-    cp(deploymentManifestPath, tmpDeploymentManifest)((err) => {
-      if (err) return next(err);
-      next(null, require(tmpDeploymentManifest));
-    });
-  }].concat(afterDeploymentPlugins)
-  .concat([getReleaseManifest(plugins, tmpDir, dirname(deploymentManifestPath))])
-  .concat(afterRelease)
+    clear,
+    createTmpDir(tmpDir),
+    (next) => {
+      cp(deploymentManifestPath, tmpDeploymentManifest)((err) => {
+        if (err) return next(err);
+        next(null, require(tmpDeploymentManifest));
+      });
+    }].concat(afterDeploymentPlugins)
+    .concat([getReleaseManifest(plugins, tmpDir, dirname(deploymentManifestPath))])
+    .concat(afterRelease)
   , done);
 };
 

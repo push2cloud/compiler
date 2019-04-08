@@ -11,16 +11,16 @@ const executeScript = require('./lib/executeScript');
 const requireJSONIn = require('./lib/requireJSON');
 
 const tools = {
-  executeScript: executeScript
-, repoHash: repoHash
+  executeScript: executeScript,
+  repoHash: repoHash
 };
 
 const buildWorkspace = (
-  options
-, plugins
-, deploymentConfigPath
-, workspacePath
-, done
+  options,
+  plugins,
+  deploymentConfigPath,
+  workspacePath,
+  done
 ) => {
   if (!done) {
     done = workspacePath;
@@ -47,37 +47,39 @@ const buildWorkspace = (
   }
 
   async.series(
-    [ clear
-    , mkdirp(workspacePath)
-    , (cb) => async.each(
-        config.apps
-      , (app, next) => {
-        const hash = repoHash(app.source);
-        debug(app.name + ' ' + hash);
-        const target = join(workspacePath, 'by-id', hash);
+    [
+      clear,
+      mkdirp(workspacePath),
+      (cb) => async.each(
+        config.apps,
+        (app, next) => {
+          const hash = repoHash(app.source);
+          debug(app.name + ' ' + hash);
+          const target = join(workspacePath, 'by-id', hash);
 
-        if (hashes[hash]) return next();
-        hashes[hash] = app.source;
-        const getSourcePlugins = _.filter(plugins, (p) => p.getSource && p.type === app.source.type);
+          if (hashes[hash]) return next();
+          hashes[hash] = app.source;
+          const getSourcePlugins = _.filter(plugins, (p) => p.getSource && p.type === app.source.type);
 
-        async.series(
-          _.map(getSourcePlugins, (p) => p.getSource(app, target))
-          , next);
-      }, cb)
-    , (cb) => async.eachSeries(
-       _.keys(hashes)
-      , (hash, next) => {
-        debug('starting postActions');
-        const source = hashes[hash];
-        const rootDir = join(workspacePath, 'by-id', hash);
-        const postActionPlugins = _.filter(plugins, (p) => p.postAction);
+          async.series(
+            _.map(getSourcePlugins, (p) => p.getSource(app, target))
+            , next);
+        }, cb),
+      (cb) => async.eachSeries(
+        _.keys(hashes),
+        (hash, next) => {
+          debug('starting postActions');
+          const source = hashes[hash];
+          const rootDir = join(workspacePath, 'by-id', hash);
+          const postActionPlugins = _.filter(plugins, (p) => p.postAction);
 
-        async.series(
-          _.map(postActionPlugins, (p) =>
-            p.postAction(source, rootDir, hash, deploymentConfigPath, tools))
-        , next);
-      }, cb
-    )
+          async.series(
+            _.map(postActionPlugins, (p) =>
+              p.postAction(source, rootDir, hash, deploymentConfigPath, tools)),
+            next
+          );
+        }, cb
+      )
     ], debugCb(debug, (err) => done(err, hashes))
   );
 };
